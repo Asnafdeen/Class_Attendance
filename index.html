@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FFFFFF;
+    --bg-alt: #F5F5F3;
+    --paper: #1C1C1A;
+    --paper-dim: #6B6B66;
+    --line: rgba(28,28,26,0.10);
+    --line-strong: rgba(28,28,26,0.22);
+    --present: #2E7D4F;
+    --present-dim: rgba(46,125,79,0.10);
+    --absent: #B23A2A;
+    --absent-dim: rgba(178,58,42,0.09);
+    --amber: #A9720C;
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height:100vh;
+    padding: 40px 20px 80px;
+  }
+  .wrap{ max-width: 840px; margin: 0 auto; }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+    border-bottom: 2px solid var(--line-strong);
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    color: var(--amber);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size: 32px;
+    margin:0;
+    letter-spacing: .01em;
+  }
+  .subtitle{
+    font-size:12.5px;
+    color: var(--paper-dim);
+    margin-top:6px;
+  }
+  .subtitle input{
+    background:transparent;
+    border:none;
+    border-bottom:1px dashed var(--line-strong);
+    color: var(--paper-dim);
+    font-family:inherit;
+    font-size:inherit;
+    padding:2px 0;
+    width: 220px;
+  }
+  .subtitle input:focus{ outline:none; border-bottom-color:var(--amber); color:var(--paper); }
+
+  .date-block{ text-align:right; }
+  .date-nav{ display:flex; align-items:center; gap:10px; justify-content:flex-end; }
+  .date-nav button{
+    background:none;
+    border:1px solid var(--line-strong);
+    color:var(--paper);
+    width:30px; height:30px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    font-family:inherit;
+    font-size:14px;
+    transition: border-color .15s, background .15s;
+  }
+  .date-nav button:hover{ border-color: var(--amber); background: rgba(217,164,65,0.1); }
+  .date-nav input[type="date"]{
+    background: var(--bg-alt);
+    border:1px solid var(--line-strong);
+    color: var(--paper);
+    font-family:'Spectral', serif;
+    font-weight:600;
+    font-size:16px;
+    padding:5px 10px;
+    border-radius:var(--radius);
+    color-scheme: light;
+  }
+  .today-btn{
+    background:none;
+    border:none;
+    color: var(--amber);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    cursor:pointer;
+    margin-top:6px;
+    padding:0;
+  }
+  .today-btn:hover{ text-decoration:underline; }
+
+  .intro{
+    font-size:13px;
+    line-height:1.6;
+    color: var(--paper-dim);
+    background: var(--bg-alt);
+    border-left: 3px solid var(--amber);
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+  .intro strong{ color: var(--paper); }
+
+  /* add student row */
+  .add-row{
+    display:flex;
+    gap:10px;
+    margin-bottom: 24px;
+  }
+  .add-row input{
+    flex:1;
+    background: var(--bg-alt);
+    border:1px solid var(--line-strong);
+    color: var(--paper);
+    font-family:inherit;
+    font-size:14px;
+    padding:10px 12px;
+    border-radius:var(--radius);
+  }
+  .add-row input:focus{ outline:none; border-color:var(--amber); }
+  .add-row button{
+    background: var(--amber);
+    color: #16261F;
+    border:none;
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:14px;
+    padding:0 20px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition: filter .15s;
+  }
+  .add-row button:hover{ filter:brightness(1.1); }
+
+  /* roster table */
+  .roster{ margin-bottom: 30px; }
+  .row{
+    display:grid;
+    grid-template-columns: 46px 1fr auto auto;
+    align-items:center;
+    gap:14px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .roll{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    color: var(--paper-dim);
+    font-size:13px;
+  }
+  .name{ font-size:15px; }
+  .pct{
+    font-size:11px;
+    color: var(--paper-dim);
+    text-align:right;
+    min-width: 90px;
+  }
+  .pct b{ color: var(--paper); font-size:12.5px; }
+
+  .stamp-btn{
+    position:relative;
+    border:2px solid var(--line-strong);
+    background:transparent;
+    color: var(--paper-dim);
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:7px 14px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition: all .12s ease;
+    min-width: 96px;
+  }
+  .stamp-btn.present{
+    border-color: var(--present);
+    color: var(--present);
+    background: var(--present-dim);
+  }
+  .stamp-btn.absent{
+    border-color: var(--absent);
+    color: var(--absent);
+    background: var(--absent-dim);
+  }
+  .stamp-btn:active{ transform: scale(0.94); }
+
+  .del-btn{
+    background:none;
+    border:none;
+    color: var(--paper-dim);
+    opacity:.4;
+    cursor:pointer;
+    font-size:15px;
+    padding:4px 6px;
+    transition: opacity .15s, color .15s;
+  }
+  .del-btn:hover{ opacity:1; color: var(--absent); }
+
+  .row-actions{ display:flex; align-items:center; gap:8px; }
+
+  .empty{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--paper-dim);
+    font-size:13px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+  }
+
+  /* summary strip */
+  .summary{
+    display:flex;
+    gap:0;
+    border:1px solid var(--line-strong);
+    border-radius: var(--radius);
+    overflow:hidden;
+    margin-top: 10px;
+  }
+  .summary .cell{
+    flex:1;
+    padding: 16px 14px;
+    border-right:1px solid var(--line-strong);
+  }
+  .summary .cell:last-child{ border-right:none; }
+  .summary .num{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:24px;
+    display:block;
+  }
+  .summary .cell.present .num{ color: var(--present); }
+  .summary .cell.absent .num{ color: var(--absent); }
+  .summary .cell.marked .num{ color: var(--amber); }
+  .summary .lbl{
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: var(--paper-dim);
+  }
+
+  footer{
+    margin-top: 40px;
+    text-align:center;
+    font-size:11px;
+    color: var(--paper-dim);
+    opacity:.6;
+  }
+
+  @media (max-width: 640px){
+    body{ padding: 24px 14px 60px; }
+    h1{ font-size: 26px; }
+    header{ align-items:flex-start; gap:14px; }
+    .date-block{ text-align:left; width:100%; }
+    .date-nav{ justify-content:flex-start; width:100%; }
+    .date-nav input[type="date"]{ flex:1; min-width:0; }
+    .subtitle input{ width: 100%; max-width:260px; }
+
+    .add-row{ flex-direction:column; }
+    .add-row button{ padding:10px 20px; }
+
+    .row{
+      grid-template-columns: 26px 1fr;
+      row-gap:10px;
+      padding: 14px 2px;
+    }
+    .roll{ font-size:12px; }
+    .name{ font-size:14px; word-break:break-word; }
+    .pct{ grid-column: 1 / -1; text-align:left; order:3; }
+    .row-actions{ grid-column: 1 / -1; order:4; justify-content:space-between; }
+    .stamp-btn{ flex:1; }
+
+    .summary{ flex-direction:column; }
+    .summary .cell{ border-right:none; border-bottom:1px solid var(--line-strong); }
+    .summary .cell:last-child{ border-bottom:none; }
+  }
+
+  @media (max-width: 380px){
+    h1{ font-size: 22px; }
+    .stamp-btn{ font-size:10px; padding:7px 8px; min-width:0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Roll Call</p>
+      <h1>Attendance Register</h1>
+      <div class="subtitle">
+        <input id="className" type="text" placeholder="Class / subject name" />
+      </div>
+    </div>
+    <div class="date-block">
+      <div class="date-nav">
+        <button id="prevDay" title="Previous day">‹</button>
+        <input type="date" id="datePicker" />
+        <button id="nextDay" title="Next day">›</button>
+      </div>
+      <button class="today-btn" id="jumpToday">Jump to today</button>
+    </div>
+  </header>
+
+  <div class="intro">
+    <p>Keep track of who showed up, day by day. Add each student once below, then tap their name's button to mark <strong>Present</strong> or <strong>Absent</strong> for the date shown — tap again to clear a mistake. Use the arrows or the date box to move between days. Everything is saved automatically in this browser, and each student's overall attendance % updates as you go.</p>
+  </div>
+
+  <div class="add-row">
+    <input type="text" id="newStudentName" placeholder="Add a student name and press Enter…" />
+    <button id="addStudentBtn">Add</button>
+  </div>
+
+  <div class="roster" id="roster"></div>
+
+  <div class="summary" id="summary"></div>
+
+  <footer>Stored locally in this browser — nothing is sent anywhere.</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'attendance-register-data';
+
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { className:'', students: [], records: {} };
+  }
+  function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+  let data = loadData();
+  let currentDate = todayStr();
+
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function fmtDate(str){
+    const [y,m,d] = str.split('-').map(Number);
+    const dt = new Date(y, m-1, d);
+    return dt.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  }
+
+  function uid(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+  // ---- elements ----
+  const rosterEl = document.getElementById('roster');
+  const summaryEl = document.getElementById('summary');
+  const datePicker = document.getElementById('datePicker');
+  const classNameInput = document.getElementById('className');
+  const newStudentInput = document.getElementById('newStudentName');
+
+  classNameInput.value = data.className || '';
+  datePicker.value = currentDate;
+
+  classNameInput.addEventListener('input', () => {
+    data.className = classNameInput.value;
+    saveData();
+  });
+
+  document.getElementById('addStudentBtn').addEventListener('click', addStudent);
+  newStudentInput.addEventListener('keydown', e => { if(e.key === 'Enter') addStudent(); });
+
+  function addStudent(){
+    const name = newStudentInput.value.trim();
+    if(!name) return;
+    data.students.push({ id: uid(), name });
+    newStudentInput.value = '';
+    saveData();
+    render();
+  }
+
+  function removeStudent(id){
+    if(!confirm('Remove this student and their attendance history?')) return;
+    data.students = data.students.filter(s => s.id !== id);
+    Object.keys(data.records).forEach(date => { delete data.records[date][id]; });
+    saveData();
+    render();
+  }
+
+  function cycleStatus(id){
+    // unmarked -> present -> absent -> unmarked
+    if(!data.records[currentDate]) data.records[currentDate] = {};
+    const rec = data.records[currentDate];
+    const cur = rec[id];
+    if(cur === undefined) rec[id] = 'P';
+    else if(cur === 'P') rec[id] = 'A';
+    else delete rec[id];
+    saveData();
+    render();
+  }
+
+  function statusOf(id, date){
+    return (data.records[date] && data.records[date][id]) || null;
+  }
+
+  function attendancePct(id){
+    let present = 0, total = 0;
+    Object.values(data.records).forEach(rec => {
+      if(rec[id] === 'P'){ present++; total++; }
+      else if(rec[id] === 'A'){ total++; }
+    });
+    if(total === 0) return null;
+    return Math.round((present/total)*100);
+  }
+
+  function setDate(dateStr){
+    currentDate = dateStr;
+    datePicker.value = dateStr;
+    render();
+  }
+
+  document.getElementById('prevDay').addEventListener('click', () => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate()-1);
+    setDate(d.toISOString().slice(0,10));
+  });
+  document.getElementById('nextDay').addEventListener('click', () => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate()+1);
+    setDate(d.toISOString().slice(0,10));
+  });
+  document.getElementById('jumpToday').addEventListener('click', () => setDate(todayStr()));
+  datePicker.addEventListener('change', () => setDate(datePicker.value));
+
+  function render(){
+    // roster
+    if(data.students.length === 0){
+      rosterEl.innerHTML = '<div class="empty">No students yet — add your first name above.</div>';
+    } else {
+      rosterEl.innerHTML = data.students.map((s, i) => {
+        const status = statusOf(s.id, currentDate);
+        const pct = attendancePct(s.id);
+        const btnClass = status === 'P' ? 'present' : status === 'A' ? 'absent' : '';
+        const btnLabel = status === 'P' ? 'Present' : status === 'A' ? 'Absent' : 'Mark';
+        return `
+          <div class="row">
+            <div class="roll">${String(i+1).padStart(2,'0')}</div>
+            <div class="name">${escapeHtml(s.name)}</div>
+            <div class="pct">${pct === null ? 'no record yet' : '<b>'+pct+'%</b> overall'}</div>
+            <div class="row-actions">
+              <button class="stamp-btn ${btnClass}" onclick="cycleStatus('${s.id}')">${btnLabel}</button>
+              <button class="del-btn" onclick="removeStudent('${s.id}')" title="Remove student">✕</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // summary for current date
+    const rec = data.records[currentDate] || {};
+    const total = data.students.length;
+    const present = data.students.filter(s => rec[s.id] === 'P').length;
+    const absent = data.students.filter(s => rec[s.id] === 'A').length;
+    const marked = present + absent;
+
+    summaryEl.innerHTML = `
+      <div class="cell present"><span class="num">${present}</span><span class="lbl">Present</span></div>
+      <div class="cell absent"><span class="num">${absent}</span><span class="lbl">Absent</span></div>
+      <div class="cell marked"><span class="num">${marked}/${total}</span><span class="lbl">Marked · ${fmtDate(currentDate)}</span></div>
+    `;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  render();
+</script>
+</body>
+</html>
