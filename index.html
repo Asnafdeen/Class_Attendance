@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Roll Call</p>
+      <h1>Attendance Register</h1>
+      <div class="subtitle">
+        <input id="className" type="text" placeholder="Class name (e.g. Grade 10 - A)" />
+      </div>
+    </div>
+    <div class="date-block">
+      <div class="date-nav">
+        <button id="prevDay" title="Previous day">‹</button>
+        <input type="date" id="datePicker" />
+        <button id="nextDay" title="Next day">›</button>
+      </div>
+      <button class="today-btn" id="jumpToday">Jump to today</button>
+    </div>
+  </header>
+
+  <!-- SUBJECT BAR -->
+  <div class="subject-bar">
+    <div class="subject-select-wrap">
+      <label for="subjectSelect">Subject</label>
+      <select id="subjectSelect"></select>
+    </div>
+    <div class="add-subject-row">
+      <input type="text" id="newSubjectName" placeholder="Add a subject and press Enter…" />
+      <button id="addSubjectBtn">Add</button>
+      <button id="delSubjectBtn" title="Delete current subject">✕</button>
+    </div>
+  </div>
+
+  <div class="intro">
+    <p>Add each student once below — the roster is shared across subjects. Pick a <strong>subject</strong> above, then tap a student's button to mark <strong>Present</strong> or <strong>Absent</strong> for the date shown (tap again to clear). Attendance is tracked separately for every subject. Use the arrows or date box to move between days.</p>
+  </div>
+
+  <div class="add-row">
+    <input type="text" id="newStudentName" placeholder="Add a student name and press Enter…" />
+    <button id="addStudentBtn">Add</button>
+  </div>
+
+  <div class="roster" id="roster"></div>
+
+  <div class="summary" id="summary"></div>
+
+  <footer>Stored locally in this browser — nothing is sent anywhere.</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
